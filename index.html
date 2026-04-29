@@ -93,6 +93,178 @@ const defaultTaskDetails={
 "設計部門":{proposal_align:[{name:"模擬合成簡報圖片",hours:8},{name:"參與活動內容討論會議",hours:2},{name:"提案視覺方向測試",hours:6}],proposal_external:[{name:"外部提案視覺整理",hours:32}],prep:[{name:"設計規格籌備",hours:72}],execution_early:[{name:"主視覺與設計展開",hours:120}],execution_mid:[{name:"設計製作與修正",hours:140}],execution_late:[{name:"輸出與驗收調整",hours:100}],operation_early:[{name:"現場設計支援",hours:16}],operation_midlate:[{name:"營運設計微調",hours:8}],closing:[{name:"設計資料歸檔",hours:8}]},
 "管理部門":{proposal_align:[{name:"初步財務與合約評估",hours:24}],proposal_external:[{name:"外部提案行政支援",hours:24}],prep:[{name:"預算與合約管理",hours:64}],execution_early:[{name:"採購與付款控管",hours:48}],execution_mid:[{name:"行政與財務控管",hours:48}],execution_late:[{name:"驗收與付款整理",hours:48}],operation_early:[{name:"營運行政支援",hours:64}],operation_midlate:[{name:"營運行政支援",hours:64}],closing:[{name:"結案與財務報告",hours:80}]}
 };
+const embeddedDefaultData={
+  "app": "Lifecycle Workforce Simulator",
+  "version": "4.0-task-details",
+  "exportedAt": "2026-04-26T09:01:36.768Z",
+  "settings": {
+    "projectCount": 2,
+    "intervals": [
+      7
+    ],
+    "simulationMonths": 20,
+    "hoursPerPerson": 160,
+    "durations": {
+      "提案期": 2,
+      "籌備期": 1,
+      "執行期": 6,
+      "營運期": 1,
+      "結案期": 1
+    },
+    "headcounts": {
+      "活動部門": 2,
+      "商品與營運部門": 3,
+      "行銷部門": 2,
+      "設計部門": 2,
+      "管理部門": 4
+    },
+    "smoothWithinMajorStage": true
+  },
+  "taskDetails": {
+    "活動部門": {
+      "proposal_align": [],
+      "proposal_external": [],
+      "prep": [],
+      "execution_early": [],
+      "execution_mid": [],
+      "execution_late": [],
+      "operation_early": [],
+      "operation_midlate": [],
+      "closing": []
+    },
+    "商品與營運部門": {
+      "proposal_align": [],
+      "proposal_external": [],
+      "prep": [],
+      "execution_early": [],
+      "execution_mid": [],
+      "execution_late": [],
+      "operation_early": [],
+      "operation_midlate": [],
+      "closing": []
+    },
+    "行銷部門": {
+      "proposal_align": [],
+      "proposal_external": [],
+      "prep": [],
+      "execution_early": [],
+      "execution_mid": [],
+      "execution_late": [],
+      "operation_early": [],
+      "operation_midlate": [],
+      "closing": []
+    },
+    "設計部門": {
+      "proposal_align": [
+        {
+          "name": "IP內容討論-活動內容idea、商品idea（2人*2次*3h）",
+          "hours": 12
+        },
+        {
+          "name": "協助提案內容合成（2人*3次*2h）",
+          "hours": 12
+        },
+        {
+          "name": "其他雜項設計（2人*3單*2h）",
+          "hours": 12
+        }
+      ],
+      "proposal_external": [],
+      "prep": [
+        {
+          "name": "IP商品設計前會議（2人*2次*3h）",
+          "hours": 12
+        },
+        {
+          "name": "IP設計前執行方案規劃（2人*2次*2h）",
+          "hours": 8
+        },
+        {
+          "name": "資料架構整理&執行（1人*2次*1h)",
+          "hours": 2
+        },
+        {
+          "name": "IP素材歸納整理（1人*3次*2h）",
+          "hours": 6
+        },
+        {
+          "name": "IP商品設計偷跑（2人*3次*4周*4h）",
+          "hours": 96
+        }
+      ],
+      "execution_early": [
+        {
+          "name": "IP商品設計（每人45SKU，約需2個月，每個月約20SKU，每周約完成1~2SKC）",
+          "hours": 640
+        }
+      ],
+      "execution_mid": [
+        {
+          "name": "IP社群圖設計（1人，約1.5個月與社群密切合作）",
+          "hours": 240
+        },
+        {
+          "name": "IP商品調整（2人，約1個月，耗費40~50%時間調整）",
+          "hours": 160
+        },
+        {
+          "name": "IP展覽內容設計（1人，約1個月內與活動部密切合作）",
+          "hours": 32
+        },
+        {
+          "name": "IP售票頁面設計（如有，1人，約需1-2周）",
+          "hours": 80
+        }
+      ],
+      "execution_late": [
+        {
+          "name": "IP商品調整（2人，約1個月校正，占用大概15~20%時間）",
+          "hours": 64
+        },
+        {
+          "name": "IP展覽零星內容設計（1人）",
+          "hours": 32
+        },
+        {
+          "name": "IP社群行銷內容後期新增需求（1-2人，約1個月內，約占用15%時間）",
+          "hours": 48
+        },
+        {
+          "name": "IP商品促銷、線上通路需求（1人，約1-2周）",
+          "hours": 80
+        }
+      ],
+      "operation_early": [
+        {
+          "name": "展覽拍攝與後製（約1人，1周）",
+          "hours": 40
+        },
+        {
+          "name": "其它臨時營運期間庶務設計（1人，每周約1-2次，3h）",
+          "hours": 24
+        }
+      ],
+      "operation_midlate": [
+        {
+          "name": "營運端臨時需求(約1人，每周約1-2次，2h)",
+          "hours": 16
+        }
+      ],
+      "closing": []
+    },
+    "管理部門": {
+      "proposal_align": [],
+      "proposal_external": [],
+      "prep": [],
+      "execution_early": [],
+      "execution_mid": [],
+      "execution_late": [],
+      "operation_early": [],
+      "operation_midlate": [],
+      "closing": []
+    }
+  }
+};
 let taskDetails=JSON.parse(JSON.stringify(defaultTaskDetails)),chart,intervalValues=[6,6,6,6],currentModal={dept:null,substage:null};
 function ensureTaskPath(d,s){if(!taskDetails[d])taskDetails[d]={};if(!Array.isArray(taskDetails[d][s]))taskDetails[d][s]=[]}function sumTasks(d,s){ensureTaskPath(d,s);return taskDetails[d][s].reduce((a,t)=>a+(Number(t.hours)||0),0)}function escapeHtml(str){return String(str).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
 function getInputs(){const headcounts={};$(".headcount").each(function(){headcounts[$(this).data("dept")]=Number($(this).val())||0});const intervals=[];$(".interval-input").each(function(){intervals.push(Number($(this).val())||0)});intervalValues=intervals.concat(intervalValues).slice(0,4);return{projectCount:Number($("#projectCount").val()),intervals,simulationMonths:Number($("#simulationMonths").val()),hoursPerPerson:Number($("#hoursPerPerson").val()),durations:{"提案期":Number($("#proposalDuration").val()),"籌備期":Number($("#prepDuration").val()),"執行期":Number($("#executionDuration").val()),"營運期":Number($("#operationDuration").val()),"結案期":Number($("#closingDuration").val())},headcounts}}
@@ -153,8 +325,26 @@ function closeTaskModal(){currentModal={dept:null,substage:null};$("#taskModalBa
 function renderTaskRows(){const d=currentModal.dept,s=currentModal.substage;if(!d||!s)return;let html="";taskDetails[d][s].forEach((t,i)=>{html+=`<div class="task-row"><input class="task-name" data-index="${i}" placeholder="工作項目名稱" value="${escapeHtml(t.name||"")}"><input class="task-hours" data-index="${i}" type="number" min="0" step="0.5" value="${fmt(t.hours||0)}"><button class="small danger delete-task" data-index="${i}">刪除</button></div>`});if(!html)html='<div class="tips">目前沒有工作項目。按「新增工作項目」開始建立明細。</div>';$("#taskRows").html(html);$("#modalTotalHours").text(fmt(sumTasks(d,s)));refreshAll()}
 function exportData(){const inputs=getInputs();const data={app:"Lifecycle Workforce Simulator",version:"4.0-task-details",exportedAt:new Date().toISOString(),settings:{projectCount:inputs.projectCount,intervals:inputs.intervals,simulationMonths:inputs.simulationMonths,hoursPerPerson:inputs.hoursPerPerson,durations:inputs.durations,headcounts:inputs.headcounts,smoothWithinMajorStage:$("#smoothWithinMajorStage").is(":checked")},taskDetails};const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json;charset=utf-8"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=`workforce-simulator-task-details-${new Date().toISOString().slice(0,19).replace(/[:T]/g,"-")}.json`;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url)}
 function normalizeTasks(imported){const out=JSON.parse(JSON.stringify(defaultTaskDetails));departments.forEach(d=>substages.forEach(s=>{const arr=imported?.[d]?.[s.key];if(Array.isArray(arr))out[d][s.key]=arr.map(x=>({name:String(x.name||""),hours:Math.max(0,Number(x.hours)||0)}))}));return out}
+function applyDataToUI(data){
+  const s=data?.settings||{};
+  $("#projectCount").val(Math.max(1,Math.min(5,Number(s.projectCount)||2)));
+  intervalValues=Array.isArray(s.intervals)?s.intervals.slice(0,4):[6,6,6,6];
+  renderIntervalInputs();
+  $("#simulationMonths").val(Math.max(6,Math.min(60,Number(s.simulationMonths)||20)));
+  $("#hoursPerPerson").val(Math.max(80,Math.min(180,Number(s.hoursPerPerson)||140)));
+  if(s.durations){
+    $("#proposalDuration").val(s.durations["提案期"]||2);
+    $("#prepDuration").val(s.durations["籌備期"]||1.5);
+    $("#executionDuration").val(s.durations["執行期"]||2);
+    $("#operationDuration").val(s.durations["營運期"]||2);
+    $("#closingDuration").val(s.durations["結案期"]||.5);
+  }
+  if(s.headcounts)departments.forEach(d=>{$(`.headcount[data-dept='${d}']`).val(Math.max(0,Number(s.headcounts[d])||0))});
+  $("#smoothWithinMajorStage").prop("checked",!!s.smoothWithinMajorStage);
+  taskDetails=data?.taskDetails?normalizeTasks(data.taskDetails):JSON.parse(JSON.stringify(defaultTaskDetails));
+}
 function importData(file){if(!file)return;const reader=new FileReader();reader.onload=e=>{try{const data=JSON.parse(e.target.result),s=data.settings||{};$("#projectCount").val(Math.max(1,Math.min(5,Number(s.projectCount)||2)));intervalValues=Array.isArray(s.intervals)?s.intervals.slice(0,4):[6,6,6,6];renderIntervalInputs();$("#simulationMonths").val(Math.max(6,Math.min(60,Number(s.simulationMonths)||20)));$("#hoursPerPerson").val(Math.max(80,Math.min(180,Number(s.hoursPerPerson)||140)));if(s.durations){$("#proposalDuration").val(s.durations["提案期"]||2);$("#prepDuration").val(s.durations["籌備期"]||1.5);$("#executionDuration").val(s.durations["執行期"]||2);$("#operationDuration").val(s.durations["營運期"]||2);$("#closingDuration").val(s.durations["結案期"]||.5)}if(s.headcounts)departments.forEach(d=>{$(`.headcount[data-dept='${d}']`).val(Math.max(0,Number(s.headcounts[d])||0))});if(data.taskDetails)taskDetails=normalizeTasks(data.taskDetails);alert("匯入完成");refreshAll()}catch(err){alert("匯入失敗：JSON格式錯誤");console.error(err)}finally{$("#importFileInput").val("")}};reader.readAsText(file,"utf-8")}
-function bind(){document.addEventListener("input",e=>{if(e.target.matches("#projectCount")){renderIntervalInputs();refreshAll()}else if(e.target.matches("input[type=range],.headcount,.interval-input,#smoothWithinMajorStage"))refreshAll()});$(document).on("click",".detail-btn",function(){openTaskModal($(this).data("dept"),$(this).data("substage"))});$("#closeTaskModal").on("click",closeTaskModal);$("#taskModalBackdrop").on("click",function(e){if(e.target===this)closeTaskModal()});$("#addTaskBtn").on("click",()=>{const d=currentModal.dept,s=currentModal.substage;ensureTaskPath(d,s);taskDetails[d][s].push({name:"",hours:0});renderTaskRows()});$(document).on("input",".task-name",function(){const d=currentModal.dept,s=currentModal.substage;taskDetails[d][s][Number($(this).data("index"))].name=$(this).val()});$(document).on("input",".task-hours",function(){const d=currentModal.dept,s=currentModal.substage;taskDetails[d][s][Number($(this).data("index"))].hours=Math.max(0,Number($(this).val())||0);$("#modalTotalHours").text(fmt(sumTasks(d,s)));refreshAll()});$(document).on("click",".delete-task",function(){const d=currentModal.dept,s=currentModal.substage;taskDetails[d][s].splice(Number($(this).data("index")),1);renderTaskRows()});$("#clearHoursBtn").on("click",()=>{departments.forEach(d=>substages.forEach(s=>taskDetails[d][s.key]=[]));refreshAll()});$("#resetBtn").on("click",()=>{taskDetails=JSON.parse(JSON.stringify(defaultTaskDetails));$("#projectCount").val(2);intervalValues=[6,6,6,6];renderIntervalInputs();$("#simulationMonths").val(20);$("#hoursPerPerson").val(140);$("#proposalDuration").val(2);$("#prepDuration").val(1.5);$("#executionDuration").val(2);$("#operationDuration").val(2);$("#closingDuration").val(.5);$("#smoothWithinMajorStage").prop("checked",false);$(".headcount[data-dept='活動部門']").val(2);$(".headcount[data-dept='商品與營運部門']").val(3);$(".headcount[data-dept='行銷部門']").val(2);$(".headcount[data-dept='設計部門']").val(2);$(".headcount[data-dept='管理部門']").val(4);refreshAll()});$("#scenarioBtn").on("click",()=>{$("#projectCount").val(4);intervalValues=[2,2.5,3,6];renderIntervalInputs();$("#simulationMonths").val(24);$("#proposalDuration").val(3);$("#prepDuration").val(2);$("#executionDuration").val(4);$("#operationDuration").val(3);$("#closingDuration").val(1);refreshAll()});$("#exportDataBtn").on("click",exportData);$("#importDataBtn").on("click",()=>$("#importFileInput").click());$("#importFileInput").on("change",function(){importData(this.files[0])})}
-$(function(){renderIntervalInputs();bind();refreshAll()});
+function bind(){document.addEventListener("input",e=>{if(e.target.matches("#projectCount")){renderIntervalInputs();refreshAll()}else if(e.target.matches("input[type=range],.headcount,.interval-input,#smoothWithinMajorStage"))refreshAll()});$(document).on("click",".detail-btn",function(){openTaskModal($(this).data("dept"),$(this).data("substage"))});$("#closeTaskModal").on("click",closeTaskModal);$("#taskModalBackdrop").on("click",function(e){if(e.target===this)closeTaskModal()});$("#addTaskBtn").on("click",()=>{const d=currentModal.dept,s=currentModal.substage;ensureTaskPath(d,s);taskDetails[d][s].push({name:"",hours:0});renderTaskRows()});$(document).on("input",".task-name",function(){const d=currentModal.dept,s=currentModal.substage;taskDetails[d][s][Number($(this).data("index"))].name=$(this).val()});$(document).on("input",".task-hours",function(){const d=currentModal.dept,s=currentModal.substage;taskDetails[d][s][Number($(this).data("index"))].hours=Math.max(0,Number($(this).val())||0);$("#modalTotalHours").text(fmt(sumTasks(d,s)));refreshAll()});$(document).on("click",".delete-task",function(){const d=currentModal.dept,s=currentModal.substage;taskDetails[d][s].splice(Number($(this).data("index")),1);renderTaskRows()});$("#clearHoursBtn").on("click",()=>{departments.forEach(d=>substages.forEach(s=>taskDetails[d][s.key]=[]));refreshAll()});$("#resetBtn").on("click",()=>{applyDataToUI(embeddedDefaultData);refreshAll()});$("#scenarioBtn").on("click",()=>{$("#projectCount").val(4);intervalValues=[2,2.5,3,6];renderIntervalInputs();$("#simulationMonths").val(24);$("#proposalDuration").val(3);$("#prepDuration").val(2);$("#executionDuration").val(4);$("#operationDuration").val(3);$("#closingDuration").val(1);refreshAll()});$("#exportDataBtn").on("click",exportData);$("#importDataBtn").on("click",()=>$("#importFileInput").click());$("#importFileInput").on("change",function(){importData(this.files[0])})}
+$(function(){bind();applyDataToUI(embeddedDefaultData);refreshAll()});
 </script>
 </body></html>
