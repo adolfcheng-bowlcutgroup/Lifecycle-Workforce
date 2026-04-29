@@ -1,1003 +1,160 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>西瓜皮人力負載模擬器</title>
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    :root{
-      --bg:#f6f7fb;
-      --card:#ffffff;
-      --line:#d9deea;
-      --text:#1f2937;
-      --muted:#6b7280;
-      --accent:#2563eb;
-      --low:#dcfce7;
-      --mid:#fef3c7;
-      --high:#fee2e2;
-      --over:#fecaca;
-      --blue:#dbeafe;
-      --purple:#eef2ff;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",Arial,sans-serif;
-      background:var(--bg);
-      color:var(--text);
-    }
-    .container{
-      max-width:1520px;
-      margin:0 auto;
-      padding:24px;
-    }
-    h1{font-size:30px;margin:0 0 8px}
-    .sub{
-      color:var(--muted);
-      line-height:1.7;
-      margin-bottom:20px;
-    }
-    .layout{
-      display:grid;
-      grid-template-columns:390px 1fr;
-      gap:20px;
-      align-items:start;
-    }
-    .panel,.card{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:16px;
-      box-shadow:0 8px 24px rgba(15,23,42,.06);
-    }
-    .panel{
-      padding:18px;
-      position:sticky;
-      top:16px;
-      max-height:calc(100vh - 32px);
-      overflow:auto;
-    }
-    .card{
-      padding:18px;
-      overflow:auto;
-    }
-    .content{
-      display:grid;
-      gap:20px;
-    }
-    .section-title{
-      font-size:16px;
-      font-weight:800;
-      margin:18px 0 12px;
-      padding-bottom:8px;
-      border-bottom:1px solid var(--line);
-    }
-    .field{margin-bottom:14px}
-    .field label{
-      display:flex;
-      justify-content:space-between;
-      gap:12px;
-      font-size:14px;
-      margin-bottom:6px;
-      font-weight:600;
-    }
-    input[type="range"]{width:100%}
-    input[type="number"]{
-      width:100%;
-      padding:8px 10px;
-      border:1px solid var(--line);
-      border-radius:10px;
-      font-size:14px;
-    }
-    table{
-      width:100%;
-      border-collapse:collapse;
-      font-size:14px;
-    }
-    th,td{
-      border:1px solid var(--line);
-      padding:8px;
-      text-align:center;
-      vertical-align:middle;
-    }
-    th{
-      background:#f8fafc;
-      font-weight:800;
-      white-space:nowrap;
-    }
-    .cards{
-      display:grid;
-      grid-template-columns:repeat(5,minmax(0,1fr));
-      gap:12px;
-    }
-    .metric{
-      padding:16px;
-      border-radius:14px;
-      border:1px solid var(--line);
-      background:#fff;
-    }
-    .metric h3{
-      margin:0 0 8px;
-      font-size:14px;
-      color:var(--muted);
-      font-weight:700;
-    }
-    .metric .value{
-      font-size:26px;
-      font-weight:900;
-      word-break:break-word;
-    }
-    .metric .note{
-      margin-top:6px;
-      font-size:12px;
-      color:var(--muted);
-      line-height:1.5;
-    }
-    .grid-2{
-      display:grid;
-      grid-template-columns:1.2fr 1fr;
-      gap:20px;
-    }
-    .tips{
-      line-height:1.7;
-      color:var(--muted);
-      font-size:14px;
-    }
-    .mini{
-      color:var(--muted);
-      font-size:12px;
-      line-height:1.5;
-      margin-top:6px;
-    }
-    .interval-row{
-      display:grid;
-      grid-template-columns:1fr 110px;
-      gap:10px;
-      align-items:center;
-      margin-bottom:10px;
-      font-size:14px;
-    }
-    .btns{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-      margin-top:16px;
-    }
-    .io-box{
-      margin-top:14px;
-      padding:12px;
-      border:1px dashed var(--line);
-      border-radius:12px;
-      background:#f8fafc;
-    }
-    .io-box input[type="file"]{
-      width:100%;
-      font-size:13px;
-      margin-top:8px;
-    }
-    .io-note{
-      margin-top:8px;
-      font-size:12px;
-      color:var(--muted);
-      line-height:1.5;
-    }
-    button{
-      border:none;
-      background:var(--accent);
-      color:#fff;
-      padding:10px 14px;
-      border-radius:10px;
-      font-weight:800;
-      cursor:pointer;
-    }
-    button.secondary{
-      background:#e5e7eb;
-      color:#111827;
-    }
-    .legend{
-      display:flex;
-      gap:12px;
-      flex-wrap:wrap;
-      margin-bottom:10px;
-      font-size:13px;
-      color:var(--muted);
-    }
-    .dot{
-      display:inline-block;
-      width:10px;
-      height:10px;
-      border-radius:50%;
-      margin-right:6px;
-    }
-    .tag{
-      display:inline-block;
-      font-size:12px;
-      padding:4px 8px;
-      border-radius:999px;
-      background:#eff6ff;
-      color:#1d4ed8;
-      margin-left:8px;
-    }
-    .pill{
-      display:inline-block;
-      padding:4px 8px;
-      border-radius:999px;
-      background:var(--purple);
-      color:#3730a3;
-      font-size:12px;
-      font-weight:800;
-    }
-    .heatmap td[data-level="low"]{background:var(--low)}
-    .heatmap td[data-level="mid"]{background:var(--mid)}
-    .heatmap td[data-level="high"]{background:var(--high)}
-    .heatmap td[data-level="over"]{background:var(--over);font-weight:900}
-    .timeline-table td.active{background:var(--blue);font-weight:700}
-    .timeline-table td.empty{color:#cbd5e1}
-    .stage-group{
-      background:var(--purple)!important;
-      color:#3730a3;
-    }
-    .substage-name{
-      text-align:left;
-      font-weight:800;
-      background:#fff;
-    }
-    .people-input{
-      min-width:76px;
-    }
-    .muted{
-      color:var(--muted);
-    }
-    @media(max-width:1100px){
-      .layout,.grid-2,.cards{grid-template-columns:1fr}
-      .panel{position:static;max-height:none}
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>活動公司人力負載模擬器｜工時明細版</title>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root{--bg:#f6f7fb;--card:#fff;--line:#d9deea;--text:#1f2937;--muted:#6b7280;--accent:#2563eb;--low:#dcfce7;--mid:#fef3c7;--high:#fee2e2;--over:#fecaca;--blue:#dbeafe;--purple:#eef2ff}
+*{box-sizing:border-box}body{margin:0;font-family:"Noto Sans TC","Microsoft JhengHei",Arial,sans-serif;background:var(--bg);color:var(--text)}
+.container{max-width:1540px;margin:0 auto;padding:24px}h1{font-size:30px;margin:0 0 8px}.sub{color:var(--muted);line-height:1.7;margin-bottom:20px}
+.layout{display:grid;grid-template-columns:390px 1fr;gap:20px;align-items:start}.panel,.card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:0 8px 24px rgba(15,23,42,.06)}
+.panel{padding:18px;position:sticky;top:16px;max-height:calc(100vh - 32px);overflow:auto}.card{padding:18px;overflow:auto}.content{display:grid;gap:20px}
+.section-title{font-size:16px;font-weight:800;margin:18px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.field{margin-bottom:14px}.field label{display:flex;justify-content:space-between;gap:12px;font-size:14px;margin-bottom:6px;font-weight:600}
+input[type=range]{width:100%}input[type=number],input[type=text]{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:10px;font-size:14px}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{border:1px solid var(--line);padding:8px;text-align:center;vertical-align:middle}th{background:#f8fafc;font-weight:800;white-space:nowrap}
+.cards{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}.metric{padding:16px;border-radius:14px;border:1px solid var(--line);background:#fff}.metric h3{margin:0 0 8px;font-size:14px;color:var(--muted);font-weight:700}.metric .value{font-size:26px;font-weight:900}.metric .note{margin-top:6px;font-size:12px;color:var(--muted);line-height:1.5}
+.grid-2{display:grid;grid-template-columns:1.2fr 1fr;gap:20px}.tips{line-height:1.7;color:var(--muted);font-size:14px}.mini{color:var(--muted);font-size:12px;line-height:1.5;margin-top:6px}
+.interval-row{display:grid;grid-template-columns:1fr 110px;gap:10px;align-items:center;margin-bottom:10px;font-size:14px}.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+button{border:none;background:var(--accent);color:#fff;padding:10px 14px;border-radius:10px;font-weight:800;cursor:pointer}button.secondary{background:#e5e7eb;color:#111827}button.danger{background:#dc2626}button.small{padding:6px 8px;border-radius:8px;font-size:12px}
+.io-box{margin-top:14px;padding:12px;border:1px dashed var(--line);border-radius:12px;background:#f8fafc}.io-note{margin-top:8px;font-size:12px;color:var(--muted);line-height:1.5}
+.legend{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;font-size:13px;color:var(--muted)}.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}.tag{display:inline-block;font-size:12px;padding:4px 8px;border-radius:999px;background:#eff6ff;color:#1d4ed8;margin-left:8px}.pill{display:inline-block;padding:4px 8px;border-radius:999px;background:var(--purple);color:#3730a3;font-size:12px;font-weight:800}
+.heatmap td[data-level=low]{background:var(--low)}.heatmap td[data-level=mid]{background:var(--mid)}.heatmap td[data-level=high]{background:var(--high)}.heatmap td[data-level=over]{background:var(--over);font-weight:900}.timeline-table td.active{background:var(--blue);font-weight:700}.timeline-table td.empty{color:#cbd5e1}
+.stage-group{background:var(--purple)!important;color:#3730a3}.substage-name{text-align:left;font-weight:800;background:#fff}.muted{color:var(--muted)}
+.hours-cell{display:grid;grid-template-columns:86px 54px;gap:6px;align-items:center}
+
+.detail-btn{
+  background:#f8fafc;
+  color:#6b7280;
+  border:1px solid #d9deea;
+  font-weight:normal;
+}
+.detail-btn:hover{
+  background:#e5e7eb;
+  color:#111827;
+}
+
+.hours-total{background:#ffffff;font-weight:normal;border:1px solid #d9deea}
+.modal-backdrop{display:none;position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:50;align-items:center;justify-content:center;padding:20px}.modal{width:min(760px,100%);max-height:88vh;overflow:auto;background:#fff;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.25);padding:18px;border:1px solid var(--line)}.modal-header{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:12px}.modal-title{font-size:18px;font-weight:900}.modal-sub{font-size:13px;color:var(--muted);margin-top:4px;line-height:1.5}.task-row{display:grid;grid-template-columns:1fr 120px 54px;gap:8px;align-items:center;margin-bottom:8px}.modal-summary{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:12px;border-radius:12px;background:#f8fafc;margin-top:12px}
+@media(max-width:1100px){.layout,.grid-2,.cards{grid-template-columns:1fr}.panel{position:static;max-height:none}.task-row{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
 <div class="container">
-  <h1>西瓜皮人力負載模擬器</h1>
-  <div class="sub">
-    以「案件數、案件啟動間隔、生命週期長度、子階段人數配置」模擬各部門負載。
-    底層以 0.5 個月為單位計算，畫面以每月平均負載呈現。負載率公式為：
-    <strong>該月該部門需求人數 ÷ 該部門總人數</strong>。
-  </div>
-
-  <div class="layout">
-    <aside class="panel">
-      <div class="section-title">全域參數</div>
-
-      <div class="field">
-        <label><span>案件數</span><strong id="projectCountVal">2</strong></label>
-        <input id="projectCount" type="range" min="1" max="5" step="1" value="2">
-        <div class="mini">模型依照此處設定的案件總量進行模擬，最多 5 案。</div>
-      </div>
-
-      <div class="field">
-        <label><span>案件間隔時間（月）</span><span class="muted">可自行定義</span></label>
-        <div id="intervalInputs"></div>
-        <div class="mini">例：案件1在 M1 啟動，間隔 6 個月，案件2會在 M7 啟動。</div>
-      </div>
-
-      <div class="field">
-        <label><span>模擬月份數</span><strong id="monthsVal">20</strong></label>
-        <input id="simulationMonths" type="range" min="6" max="60" step="1" value="20">
-      </div>
-
-      <div class="field">
-        <label><span>每人每月有效工時</span><strong id="hoursVal">140</strong></label>
-        <input id="hoursPerPerson" type="range" min="80" max="180" step="10" value="140">
-        <div class="mini">目前熱力圖以百分比顯示；工時保留給後續估算人日與成本。</div>
-      </div>
-
-      <div class="section-title">生命週期長度（月）</div>
-
-      <div class="field">
-        <label><span>提案期</span><strong id="proposalDurationVal">2</strong></label>
-        <input id="proposalDuration" type="range" min="0.5" max="8" step="0.5" value="2">
-      </div>
-
-      <div class="field">
-        <label><span>籌備期</span><strong id="prepDurationVal">1.5</strong></label>
-        <input id="prepDuration" type="range" min="0.5" max="8" step="0.5" value="1.5">
-      </div>
-
-      <div class="field">
-        <label><span>執行期</span><strong id="executionDurationVal">2</strong></label>
-        <input id="executionDuration" type="range" min="0.5" max="12" step="0.5" value="2">
-      </div>
-
-      <div class="field">
-        <label><span>營運期</span><strong id="operationDurationVal">2</strong></label>
-        <input id="operationDuration" type="range" min="0.5" max="12" step="0.5" value="2">
-      </div>
-
-      <div class="field">
-        <label><span>結案期</span><strong id="closingDurationVal">0.5</strong></label>
-        <input id="closingDuration" type="range" min="0.5" max="6" step="0.5" value="0.5">
-      </div>
-
-      <div class="section-title">部門人數</div>
-      <div class="field"><label>活動部門</label><input class="headcount" data-dept="活動部門" type="number" min="0" step="0.5" value="2"></div>
-      <div class="field"><label>商品與營運部門</label><input class="headcount" data-dept="商品與營運部門" type="number" min="0" step="0.5" value="3"></div>
-      <div class="field"><label>行銷部門</label><input class="headcount" data-dept="行銷部門" type="number" min="0" step="0.5" value="2"></div>
-      <div class="field"><label>設計部門</label><input class="headcount" data-dept="設計部門" type="number" min="0" step="0.5" value="2"></div>
-      <div class="field"><label>管理部門</label><input class="headcount" data-dept="管理部門" type="number" min="0" step="0.5" value="4"></div>
-
-      <div class="btns">
-        <button id="resetBtn" class="secondary">重設預設值</button>
-        <button id="scenarioBtn">測試重疊情境</button>
-      </div>
-
-      <div class="section-title">資料同步</div>
-      <div class="io-box">
-        <div class="btns" style="margin-top:0">
-          <button id="exportDataBtn">匯出資料</button>
-          <button id="importDataBtn" class="secondary">匯入資料</button>
-        </div>
-        <input id="importFileInput" type="file" accept="application/json,.json" style="display:none">
-        <div class="io-note">
-          匯出會產生 JSON 檔，可傳給其他人。對方用同一份 HTML 開啟後匯入，即可同步案件、週期、部門人數與子階段人數配置。
-        </div>
-      </div>
-    </aside>
-
-    <main class="content">
-      <div class="cards" id="summaryCards"></div>
-
-      <div class="grid-2">
-        <section class="card">
-          <h2>各部門月負載率走勢 <span class="tag">每月平均負載</span></h2>
-          <canvas id="loadChart" height="120"></canvas>
-        </section>
-
-        <section class="card">
-          <h2>目前瓶頸與空置摘要</h2>
-          <div id="insights" class="tips"></div>
-        </section>
-      </div>
-
-      <section class="card">
-        <h2>案件生命週期時間軸</h2>
-        <div class="tips" style="margin-bottom:10px;">
-          顯示每個案子在每個月份所處的主階段與子階段，用來檢查壓力如何疊加。
-        </div>
-        <div id="timelineWrap"></div>
-      </section>
-
-      <section class="card">
-        <h2>人力負載熱力圖</h2>
-        <div class="legend">
-          <span><span class="dot" style="background:#dcfce7"></span>低負載 &lt; 60%</span>
-          <span><span class="dot" style="background:#fef3c7"></span>健康 60%–85%</span>
-          <span><span class="dot" style="background:#fee2e2"></span>偏高 85%–100%</span>
-          <span><span class="dot" style="background:#fecaca"></span>超載 &gt; 100%</span>
-        </div>
-        <div class="tips" style="margin-bottom:10px;">
-          每一格代表「該部門在該月份的平均負載率」。若同月份有多案重疊，需求人數會疊加。
-        </div>
-        <div id="heatmapWrap"></div>
-      </section>
-
-      <section class="card">
-        <h2>各生命週期子階段對各部門的人數配置</h2>
-        <div class="tips" style="margin-bottom:10px;">
-          直接填「該子階段需要幾個人」。每個欄位上限會自動等於該部門目前人數，支援小數點第一位。
-          主階段會自動顯示目前生命週期長度，例如：提案期（2M）、執行期（6M）。
-        </div>
-        <div id="peopleTableWrap"></div>
-      </section>
-    </main>
-  </div>
-</div>
-
+<h1>活動公司人力負載模擬器｜工時明細版</h1>
+<div class="sub">以「案件數、案件啟動間隔、生命週期長度、子階段需求工時明細」模擬各部門負載。負載率公式：<strong>該月該部門需求工時 ÷（部門人數 × 每人每月有效工時）</strong>。</div>
+<div class="layout">
+<aside class="panel">
+<div class="section-title">全域參數</div>
+<div class="field"><label><span>案件數</span><strong id="projectCountVal">2</strong></label><input id="projectCount" type="range" min="1" max="5" step="1" value="2"></div>
+<div class="field"><label><span>案件間隔時間（月）</span><span class="muted">可自行定義</span></label><div id="intervalInputs"></div><div class="mini">例：案件1在 M1，間隔 6 個月，案件2在 M7。</div></div>
+<div class="field"><label><span>模擬月份數</span><strong id="monthsVal">20</strong></label><input id="simulationMonths" type="range" min="6" max="60" step="1" value="20"></div>
+<div class="field"><label><span>每人每月有效工時</span><strong id="hoursVal">140</strong></label><input id="hoursPerPerson" type="range" min="80" max="180" step="10" value="140"></div>
+<div class="section-title">生命週期長度（月）</div>
+<div class="field"><label><span>提案期</span><strong id="proposalDurationVal">2</strong></label><input id="proposalDuration" type="range" min="0.5" max="8" step="0.5" value="2"></div>
+<div class="field"><label><span>籌備期</span><strong id="prepDurationVal">1.5</strong></label><input id="prepDuration" type="range" min="0.5" max="8" step="0.5" value="1.5"></div>
+<div class="field"><label><span>執行期</span><strong id="executionDurationVal">2</strong></label><input id="executionDuration" type="range" min="0.5" max="12" step="0.5" value="2"></div>
+<div class="field"><label><span>營運期</span><strong id="operationDurationVal">2</strong></label><input id="operationDuration" type="range" min="0.5" max="12" step="0.5" value="2"></div>
+<div class="field"><label><span>結案期</span><strong id="closingDurationVal">0.5</strong></label><input id="closingDuration" type="range" min="0.5" max="6" step="0.5" value="0.5"></div>
+<div class="section-title">部門人數</div>
+<div class="field"><label>活動部門</label><input class="headcount" data-dept="活動部門" type="number" min="0" step="0.5" value="2"></div>
+<div class="field"><label>商品與營運部門</label><input class="headcount" data-dept="商品與營運部門" type="number" min="0" step="0.5" value="3"></div>
+<div class="field"><label>行銷部門</label><input class="headcount" data-dept="行銷部門" type="number" min="0" step="0.5" value="2"></div>
+<div class="field"><label>設計部門</label><input class="headcount" data-dept="設計部門" type="number" min="0" step="0.5" value="2"></div>
+<div class="field"><label>管理部門</label><input class="headcount" data-dept="管理部門" type="number" min="0" step="0.5" value="4"></div>
+<div class="btns"><button id="resetBtn" class="secondary">重設預設值</button><button id="scenarioBtn">測試重疊情境</button></div>
+<div class="section-title">資料同步</div>
+<div class="io-box"><div class="btns" style="margin-top:0"><button id="exportDataBtn">匯出資料</button><button id="importDataBtn" class="secondary">匯入資料</button></div><input id="importFileInput" type="file" accept="application/json,.json" style="display:none"><div class="io-note">匯出 JSON 會保存所有工作明細。對方用同一份 HTML 匯入即可還原。</div></div>
+</aside>
+<main class="content">
+<div class="cards" id="summaryCards"></div>
+<div class="grid-2"><section class="card"><h2>各部門月負載率走勢 <span class="tag">每月平均負載</span></h2><canvas id="loadChart" height="120"></canvas></section><section class="card"><h2>目前瓶頸與空置摘要</h2><div id="insights" class="tips"></div></section></div>
+<section class="card"><h2>案件生命週期時間軸</h2><div id="timelineWrap"></div></section>
+<section class="card"><h2>人力負載熱力圖</h2><div class="legend"><span><span class="dot" style="background:#dcfce7"></span>低負載 &lt; 60%</span><span><span class="dot" style="background:#fef3c7"></span>健康 60%–85%</span><span><span class="dot" style="background:#fee2e2"></span>偏高 85%–100%</span><span><span class="dot" style="background:#fecaca"></span>超載 &gt; 100%</span></div><div id="heatmapWrap"></div></section>
+<section class="card"><h2>各生命週期子階段對各部門的需求工時</h2>
+<div class="btns" style="margin:0 0 10px"><button id="clearHoursBtn" class="secondary">全部歸0</button></div>
+<label style="display:flex;align-items:center;gap:8px;margin:8px 0 10px;color:#374151;font-size:14px">
+  <input id="smoothWithinMajorStage" type="checkbox" style="width:auto">
+  <span>自動平滑同一主階段內的工時（超出子階段產能時，往下一個子階段溢出；不跨主階段）</span>
+</label>
+<div class="tips" style="margin-bottom:10px">每格顯示工作明細合計小時。按「明細」可新增/刪除工作項目與時數；匯出 JSON 會保存所有明細。開啟平滑後，原始明細不會被改掉，只會影響熱力圖與圖表計算。</div><div id="hoursTableWrap"></div></section>
+</main></div></div>
+<div id="taskModalBackdrop" class="modal-backdrop"><div class="modal"><div class="modal-header"><div><div id="modalTitle" class="modal-title">工作明細</div><div id="modalSub" class="modal-sub"></div></div><button id="closeTaskModal" class="secondary">關閉</button></div><div id="taskRows"></div><div class="btns"><button id="addTaskBtn">新增工作項目</button></div><div class="modal-summary"><div><strong>合計工時</strong><div class="mini">修改時會自動回填到表格與圖表</div></div><div style="font-size:24px;font-weight:900"><span id="modalTotalHours">0</span>h</div></div></div></div>
 <script>
-const departments = ["活動部門","商品與營運部門","行銷部門","設計部門","管理部門"];
-const majorStages = ["提案期","籌備期","執行期","營運期","結案期"];
-const halfStepsPerMonth = 2;
-
-const substages = [
-  { key:"proposal_align", major:"提案期", name:"內部對焦", ratio:0.5 },
-  { key:"proposal_external", major:"提案期", name:"外部提案", ratio:0.5 },
-  { key:"prep", major:"籌備期", name:"籌備期", ratio:1 },
-  { key:"execution_early", major:"執行期", name:"前期", ratio:1/3 },
-  { key:"execution_mid", major:"執行期", name:"中期", ratio:1/3 },
-  { key:"execution_late", major:"執行期", name:"後期", ratio:1/3 },
-  { key:"operation_early", major:"營運期", name:"前期", ratio:0.5 },
-  { key:"operation_midlate", major:"營運期", name:"中後期", ratio:0.5 },
-  { key:"closing", major:"結案期", name:"結案期", ratio:1 }
-];
-
-const defaultPeople = {
-  "活動部門": {
-    proposal_align:1.2, proposal_external:1.4, prep:1.6,
-    execution_early:1.8, execution_mid:1.8, execution_late:1.6,
-    operation_early:1.8, operation_midlate:1.6, closing:1.0
-  },
-  "商品與營運部門": {
-    proposal_align:0.3, proposal_external:0.5, prep:1.2,
-    execution_early:1.6, execution_mid:2.0, execution_late:2.3,
-    operation_early:2.5, operation_midlate:2.4, closing:1.0
-  },
-  "行銷部門": {
-    proposal_align:0.6, proposal_external:1.0, prep:1.0,
-    execution_early:0.5, execution_mid:0.7, execution_late:1.0,
-    operation_early:1.8, operation_midlate:1.6, closing:0.4
-  },
-  "設計部門": {
-    proposal_align:0.8, proposal_external:1.2, prep:1.6,
-    execution_early:1.8, execution_mid:2.0, execution_late:1.5,
-    operation_early:0.3, operation_midlate:0.2, closing:0.2
-  },
-  "管理部門": {
-    proposal_align:1.0, proposal_external:1.0, prep:1.6,
-    execution_early:1.2, execution_mid:1.2, execution_late:1.2,
-    operation_early:1.5, operation_midlate:1.5, closing:1.6
-  }
+const departments=["活動部門","商品與營運部門","行銷部門","設計部門","管理部門"],majorStages=["提案期","籌備期","執行期","營運期","結案期"],halfStepsPerMonth=2;
+const substages=[{key:"proposal_align",major:"提案期",name:"內部對焦",ratio:.5},{key:"proposal_external",major:"提案期",name:"外部提案",ratio:.5},{key:"prep",major:"籌備期",name:"籌備期",ratio:1},{key:"execution_early",major:"執行期",name:"前期",ratio:1/3},{key:"execution_mid",major:"執行期",name:"中期",ratio:1/3},{key:"execution_late",major:"執行期",name:"後期",ratio:1/3},{key:"operation_early",major:"營運期",name:"前期",ratio:.5},{key:"operation_midlate",major:"營運期",name:"中後期",ratio:.5},{key:"closing",major:"結案期",name:"結案期",ratio:1}];
+const defaultTaskDetails={
+"活動部門":{proposal_align:[{name:"內部會議與概念對焦",hours:32}],proposal_external:[{name:"外部提案與溝通",hours:40}],prep:[{name:"籌備與資源協調",hours:80}],execution_early:[{name:"執行前期控管",hours:96}],execution_mid:[{name:"執行中期控管",hours:96}],execution_late:[{name:"執行後期收斂",hours:80}],operation_early:[{name:"營運前期現場管理",hours:96}],operation_midlate:[{name:"營運中後期管理",hours:80}],closing:[{name:"結案資料整理",hours:32}]},
+"商品與營運部門":{proposal_align:[{name:"商品營運初步評估",hours:8}],proposal_external:[{name:"商品營運提案支援",hours:16}],prep:[{name:"供應鏈與庫存規劃",hours:64}],execution_early:[{name:"商品執行前期準備",hours:80}],execution_mid:[{name:"商品執行中期管理",hours:120}],execution_late:[{name:"商品執行後期驗收",hours:140}],operation_early:[{name:"營運前期商品管理",hours:160}],operation_midlate:[{name:"營運中後期商品管理",hours:150}],closing:[{name:"商品營運結案",hours:40}]},
+"行銷部門":{proposal_align:[{name:"市場與受眾初步分析",hours:16}],proposal_external:[{name:"提案包裝與溝通",hours:32}],prep:[{name:"行銷計畫籌備",hours:48}],execution_early:[{name:"預熱素材規劃",hours:24}],execution_mid:[{name:"宣傳執行",hours:40}],execution_late:[{name:"開展前推廣",hours:56}],operation_early:[{name:"營運前期推廣",hours:120}],operation_midlate:[{name:"營運中後期推廣",hours:96}],closing:[{name:"行銷成效整理",hours:16}]},
+"設計部門":{proposal_align:[{name:"模擬合成簡報圖片",hours:8},{name:"參與活動內容討論會議",hours:2},{name:"提案視覺方向測試",hours:6}],proposal_external:[{name:"外部提案視覺整理",hours:32}],prep:[{name:"設計規格籌備",hours:72}],execution_early:[{name:"主視覺與設計展開",hours:120}],execution_mid:[{name:"設計製作與修正",hours:140}],execution_late:[{name:"輸出與驗收調整",hours:100}],operation_early:[{name:"現場設計支援",hours:16}],operation_midlate:[{name:"營運設計微調",hours:8}],closing:[{name:"設計資料歸檔",hours:8}]},
+"管理部門":{proposal_align:[{name:"初步財務與合約評估",hours:24}],proposal_external:[{name:"外部提案行政支援",hours:24}],prep:[{name:"預算與合約管理",hours:64}],execution_early:[{name:"採購與付款控管",hours:48}],execution_mid:[{name:"行政與財務控管",hours:48}],execution_late:[{name:"驗收與付款整理",hours:48}],operation_early:[{name:"營運行政支援",hours:64}],operation_midlate:[{name:"營運行政支援",hours:64}],closing:[{name:"結案與財務報告",hours:80}]}
 };
+let taskDetails=JSON.parse(JSON.stringify(defaultTaskDetails)),chart,intervalValues=[6,6,6,6],currentModal={dept:null,substage:null};
+function ensureTaskPath(d,s){if(!taskDetails[d])taskDetails[d]={};if(!Array.isArray(taskDetails[d][s]))taskDetails[d][s]=[]}function sumTasks(d,s){ensureTaskPath(d,s);return taskDetails[d][s].reduce((a,t)=>a+(Number(t.hours)||0),0)}function escapeHtml(str){return String(str).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function getInputs(){const headcounts={};$(".headcount").each(function(){headcounts[$(this).data("dept")]=Number($(this).val())||0});const intervals=[];$(".interval-input").each(function(){intervals.push(Number($(this).val())||0)});intervalValues=intervals.concat(intervalValues).slice(0,4);return{projectCount:Number($("#projectCount").val()),intervals,simulationMonths:Number($("#simulationMonths").val()),hoursPerPerson:Number($("#hoursPerPerson").val()),durations:{"提案期":Number($("#proposalDuration").val()),"籌備期":Number($("#prepDuration").val()),"執行期":Number($("#executionDuration").val()),"營運期":Number($("#operationDuration").val()),"結案期":Number($("#closingDuration").val())},headcounts}}
+function renderIntervalInputs(){const n=Number($("#projectCount").val());let html="";if(n<=1)html='<div class="mini">只有 1 個案件時，不需要設定案件間隔。</div>';else for(let i=1;i<n;i++){html+=`<div class="interval-row"><div>案件 ${i} → 案件 ${i+1}</div><input class="interval-input" type="number" min="0" step="0.5" value="${intervalValues[i-1]??6}"></div>`}$("#intervalInputs").html(html)}
+function allocateSteps(total,items){const exact=items.map(x=>({...x,e:total*x.ratio}));let a=exact.map(x=>({...x,steps:Math.floor(x.e)}));let rem=total-a.reduce((s,x)=>s+x.steps,0);a.sort((x,y)=>(y.e-Math.floor(y.e))-(x.e-Math.floor(x.e)));for(let i=0;i<rem;i++)a[i%a.length].steps++;a.sort((x,y)=>items.findIndex(z=>z.key===x.key)-items.findIndex(z=>z.key===y.key));return a}
+function buildSchedule(durations){const schedule=[],counts={};majorStages.forEach(major=>{const steps=Math.max(1,Math.round(durations[major]*2));allocateSteps(steps,substages.filter(s=>s.major===major)).forEach(child=>{counts[child.key]=child.steps;for(let i=0;i<child.steps;i++)schedule.push(child)})});return{schedule,counts}}
 
-let peopleDemand = JSON.parse(JSON.stringify(defaultPeople));
-let chart;
-let intervalValues = [6,6,6,6];
-
-function getInputs(){
-  const headcounts = {};
-  $(".headcount").each(function(){
-    headcounts[$(this).data("dept")] = Number($(this).val()) || 0;
-  });
-
-  const intervals = [];
-  $(".interval-input").each(function(){
-    intervals.push(Number($(this).val()) || 0);
-  });
-  intervalValues = intervals.concat(intervalValues).slice(0,4);
-
-  return {
-    projectCount: Number($("#projectCount").val()),
-    intervals,
-    simulationMonths: Number($("#simulationMonths").val()),
-    hoursPerPerson: Number($("#hoursPerPerson").val()),
-    durations: {
-      "提案期": Number($("#proposalDuration").val()),
-      "籌備期": Number($("#prepDuration").val()),
-      "執行期": Number($("#executionDuration").val()),
-      "營運期": Number($("#operationDuration").val()),
-      "結案期": Number($("#closingDuration").val())
-    },
-    headcounts
-  };
-}
-
-function renderIntervalInputs(){
-  const projectCount = Number($("#projectCount").val());
-  let html = "";
-  if(projectCount <= 1){
-    html = '<div class="mini">只有 1 個案件時，不需要設定案件間隔。</div>';
-  }else{
-    for(let i=1;i<projectCount;i++){
-      const val = intervalValues[i-1] ?? 6;
-      html += `
-        <div class="interval-row">
-          <div>案件 ${i} → 案件 ${i+1}</div>
-          <input class="interval-input" data-index="${i-1}" type="number" min="0" step="0.5" value="${val}">
-        </div>
-      `;
-    }
-  }
-  $("#intervalInputs").html(html);
-}
-
-function buildProjectStarts(inputs){
-  const starts = [0];
-  for(let i=1;i<inputs.projectCount;i++){
-    const interval = inputs.intervals[i-1] || 0;
-    starts.push(starts[i-1] + Math.round(interval * halfStepsPerMonth));
-  }
-  return starts;
-}
-
-function allocateSubstageSteps(majorSteps, items){
-  const exact = items.map(item => ({...item, exactSteps: majorSteps * item.ratio}));
-  let allocated = exact.map(item => ({...item, steps: Math.floor(item.exactSteps)}));
-  let remaining = majorSteps - allocated.reduce((sum,item)=>sum+item.steps,0);
-
-  allocated.sort((a,b)=>
-    (b.exactSteps - Math.floor(b.exactSteps)) -
-    (a.exactSteps - Math.floor(a.exactSteps))
-  );
-
-  for(let i=0;i<remaining;i++){
-    allocated[i % allocated.length].steps++;
-  }
-
-  allocated.sort((a,b)=>
-    items.findIndex(x=>x.key===a.key) - items.findIndex(x=>x.key===b.key)
-  );
-
-  return allocated;
-}
-
-function buildSubstageSchedule(durations){
-  const schedule = [];
-  majorStages.forEach(major=>{
-    const majorSteps = Math.max(1, Math.round(durations[major] * halfStepsPerMonth));
-    const children = substages.filter(s=>s.major===major);
-    const allocated = allocateSubstageSteps(majorSteps, children);
-    allocated.forEach(child=>{
-      for(let i=0;i<child.steps;i++) schedule.push(child);
-    });
-  });
-  return schedule;
-}
-
-function simulate(){
-  const inputs = getInputs();
-  const months = Array.from({length:inputs.simulationMonths},(_,i)=>`M${i+1}`);
-  const totalHalfSteps = inputs.simulationMonths * halfStepsPerMonth;
-  const substageSchedule = buildSubstageSchedule(inputs.durations);
-  const projectStarts = buildProjectStarts(inputs);
-
-  const projects = projectStarts.map((startStep,index)=>({
-    id:`案件${index+1}`,
-    startStep,
-    startMonthLabel:`M${Math.floor(startStep/halfStepsPerMonth)+1}`,
-    schedule:substageSchedule
-  }));
-
-  const halfStepPeople = {};
-  const halfStepLoad = {};
+function getSmoothedSubstageHours(inputs){
+  const smoothed = {};
   departments.forEach(dept=>{
-    halfStepPeople[dept] = Array(totalHalfSteps).fill(0);
-    halfStepLoad[dept] = Array(totalHalfSteps).fill(0);
-  });
-
-  projects.forEach(project=>{
-    project.schedule.forEach((substage,localStep)=>{
-      const step = project.startStep + localStep;
-      if(step < totalHalfSteps){
-        departments.forEach(dept=>{
-          const usedPeople = Number(peopleDemand[dept][substage.key]) || 0;
-          const totalPeople = Number(inputs.headcounts[dept]) || 0;
-          halfStepPeople[dept][step] += usedPeople;
-          halfStepLoad[dept][step] += totalPeople > 0 ? usedPeople / totalPeople : 0;
-        });
-      }
+    smoothed[dept] = {};
+    substages.forEach(sub=>{
+      smoothed[dept][sub.key] = sumTasks(dept, sub.key);
     });
   });
 
-  const monthlyLoad = {};
-  const monthlyPeople = {};
-  departments.forEach(dept=>{
-    monthlyLoad[dept] = [];
-    monthlyPeople[dept] = [];
-    for(let m=0;m<inputs.simulationMonths;m++){
-      const s1 = m*2;
-      const s2 = m*2+1;
-      monthlyLoad[dept].push(((halfStepLoad[dept][s1]||0) + (halfStepLoad[dept][s2]||0)) / 2);
-      monthlyPeople[dept].push(((halfStepPeople[dept][s1]||0) + (halfStepPeople[dept][s2]||0)) / 2);
-    }
-  });
-
-  const projectMonthlyStages = projects.map(project=>{
-    const row = [];
-    for(let m=0;m<inputs.simulationMonths;m++){
-      const stepA = m*2 - project.startStep;
-      const stepB = m*2 + 1 - project.startStep;
-      const a = project.schedule[stepA];
-      const b = project.schedule[stepB];
-
-      const labelA = a ? `${a.major}-${a.name}` : "";
-      const labelB = b ? `${b.major}-${b.name}` : "";
-
-      let label = "";
-      if(labelA && labelB && labelA === labelB) label = labelA;
-      else if(labelA && labelB) label = `${labelA}/${labelB}`;
-      else label = labelA || labelB || "";
-
-      row.push(label);
-    }
-    return {id:project.id,startMonthLabel:project.startMonthLabel,row};
-  });
-
-  return {months,projects,monthlyLoad,monthlyPeople,projectMonthlyStages,inputs};
-}
-
-function renderSummary(result){
-  const {monthlyLoad,monthlyPeople,projects,inputs} = result;
-  const allRates = departments.flatMap(d=>monthlyLoad[d]);
-  const avgRate = allRates.length ? average(allRates) : 0;
-
-  let overloadCount = 0;
-  let idleCount = 0;
-  let peakDept = "-";
-  let peakMonth = "-";
-  let peakRate = -1;
-  let peakPeople = 0;
+  if(!$("#smoothWithinMajorStage").is(":checked")) return smoothed;
 
   departments.forEach(dept=>{
-    monthlyLoad[dept].forEach((r,idx)=>{
-      if(r > 1) overloadCount++;
-      if(r < .6) idleCount++;
-      if(r > peakRate){
-        peakRate = r;
-        peakDept = dept;
-        peakMonth = `M${idx+1}`;
-        peakPeople = monthlyPeople[dept][idx];
-      }
-    });
-  });
+    const monthlyCapacity = (Number(inputs.headcounts[dept]) || 0) * (Number(inputs.hoursPerPerson) || 0);
+    if(monthlyCapacity <= 0) return;
 
-  const totalHeadcount = Object.values(inputs.headcounts).reduce((a,b)=>a+b,0);
-  const activeProjectLabels = projects.map(p=>`${p.id}: ${p.startMonthLabel}`).join(" / ");
+    majorStages.forEach(major=>{
+      const children = substages.filter(s=>s.major === major);
+      let carry = 0;
 
-  $("#summaryCards").html([
-    metricCard("總人數", `${formatNum(totalHeadcount)} 人`, "目前部門配置總和"),
-    metricCard("模擬案件數", `${inputs.projectCount} 案`, "使用者設定的案件總量"),
-    metricCard("平均負載率", `${(avgRate*100).toFixed(0)}%`, "所有部門 × 所有月份的平均"),
-    metricCard("最高峰", `${peakDept}`, `${peakMonth}：${formatNum(peakPeople)} 人，${(peakRate*100).toFixed(0)}%`),
-    metricCard("超載區間", `${overloadCount}`, "負載 > 100% 的部門月份格數")
-  ].join(""));
+      children.forEach((sub, idx)=>{
+        const substageDurationMonths = Math.max(0.5, (inputs.durations[major] || 0.5) * sub.ratio);
+        const substageCapacity = monthlyCapacity * substageDurationMonths;
+        const raw = smoothed[dept][sub.key] + carry;
 
-  const idleDepts = departments
-    .map(dept=>({dept,avg:average(monthlyLoad[dept])}))
-    .filter(x=>x.avg < .6)
-    .sort((a,b)=>a.avg-b.avg);
-
-  const busyMoments = [];
-  departments.forEach(dept=>{
-    monthlyLoad[dept].forEach((rate,idx)=>{
-      if(rate > 1){
-        busyMoments.push({
-          dept,
-          month:`M${idx+1}`,
-          rate,
-          people:monthlyPeople[dept][idx]
-        });
-      }
-    });
-  });
-  busyMoments.sort((a,b)=>b.rate-a.rate);
-
-  $("#insights").html(`
-    <p><strong>案件啟動：</strong>${activeProjectLabels}</p>
-    <p><strong>整體判讀：</strong>目前平均負載率為 <strong>${(avgRate*100).toFixed(0)}%</strong>，共有 <strong>${overloadCount}</strong> 個超載區間與 <strong>${idleCount}</strong> 個低負載區間。</p>
-    <p><strong>最大瓶頸：</strong><strong>${peakDept}</strong> 在 <strong>${peakMonth}</strong> 需要約 <strong>${formatNum(peakPeople)} 人</strong>，負載達 <strong>${(peakRate*100).toFixed(0)}%</strong>。</p>
-    <p><strong>超載月份：</strong>${busyMoments.length ? busyMoments.slice(0,6).map(x=>`${x.month} ${x.dept} ${formatNum(x.people)}人 / ${(x.rate*100).toFixed(0)}%`).join("、") : "目前沒有超載月份。"}</p>
-    <p><strong>可能空置：</strong>${idleDepts.length ? idleDepts.map(x=>`${x.dept} 平均 ${(x.avg*100).toFixed(0)}%`).join("、") : "目前沒有明顯長期低負載部門。"}</p>
-    <p><strong>建議檢查：</strong>先看最高峰月份的案件時間軸，找出是哪個案件的哪個子階段重疊，再調整案件間隔、子階段人數配置或生命週期長度。</p>
-  `);
-}
-
-function metricCard(title,value,note){
-  return `<div class="metric"><h3>${title}</h3><div class="value">${value}</div><div class="note">${note}</div></div>`;
-}
-
-function average(arr){
-  return arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : 0;
-}
-
-function formatNum(n){
-  const x = Number(n);
-  if(Number.isInteger(x)) return String(x);
-  return x.toFixed(1);
-}
-
-function renderChart(result){
-  const ctx = document.getElementById("loadChart");
-  const datasets = departments.map(dept=>({
-    label:dept,
-    data:result.monthlyLoad[dept].map(v=>Number((v*100).toFixed(1))),
-    tension:.25,
-    borderWidth:2,
-    fill:false
-  }));
-
-  if(chart) chart.destroy();
-
-  chart = new Chart(ctx,{
-    type:"line",
-    data:{labels:result.months,datasets},
-    options:{
-      responsive:true,
-      maintainAspectRatio:true,
-      scales:{
-        y:{
-          beginAtZero:true,
-          suggestedMax:160,
-          ticks:{callback:value=>value+"%"}
+        if(raw > substageCapacity && idx < children.length - 1){
+          smoothed[dept][sub.key] = substageCapacity;
+          carry = raw - substageCapacity;
+        }else{
+          smoothed[dept][sub.key] = raw;
+          carry = 0;
         }
-      },
-      plugins:{
-        tooltip:{
-          callbacks:{
-            label:context=>`${context.dataset.label}: ${context.parsed.y}%`
-          }
-        }
-      }
-    }
-  });
-}
-
-function renderTimeline(result){
-  let html = '<table class="timeline-table"><thead><tr><th>案件 / 月份</th><th>啟動</th>';
-  result.months.forEach(m=>html+=`<th>${m}</th>`);
-  html += '</tr></thead><tbody>';
-
-  result.projectMonthlyStages.forEach(project=>{
-    html += `<tr><th>${project.id}</th><td><span class="pill">${project.startMonthLabel}</span></td>`;
-    project.row.forEach(stage=>{
-      html += stage ? `<td class="active">${stage}</td>` : `<td class="empty">-</td>`;
-    });
-    html += '</tr>';
-  });
-
-  html += '</tbody></table>';
-  $("#timelineWrap").html(html);
-}
-
-function renderHeatmap(result){
-  let html = '<table class="heatmap"><thead><tr><th>部門 / 月份</th>';
-  result.months.forEach(m=>html+=`<th>${m}</th>`);
-  html += '</tr></thead><tbody>';
-
-  departments.forEach(dept=>{
-    html += `<tr><th>${dept}</th>`;
-    result.monthlyLoad[dept].forEach((rate,idx)=>{
-      const pct = (rate*100).toFixed(0)+"%";
-      const people = result.monthlyPeople[dept][idx];
-      let level = "low";
-      if(rate > 1) level = "over";
-      else if(rate >= .85) level = "high";
-      else if(rate >= .6) level = "mid";
-      html += `<td data-level="${level}" title="${dept}：${formatNum(people)}人，${pct}">${pct}<br><span class="muted">${formatNum(people)}人</span></td>`;
-    });
-    html += '</tr>';
-  });
-
-  html += '</tbody></table>';
-  $("#heatmapWrap").html(html);
-}
-
-function renderPeopleTable(){
-  const inputs = getInputs();
-  let html = '<table><thead><tr><th>主階段</th><th>子階段</th>';
-  departments.forEach(dept=>html += `<th>${dept}<br><span class="muted">${formatNum(inputs.headcounts[dept])}人</span></th>`);
-  html += '</tr></thead><tbody>';
-
-  majorStages.forEach(major=>{
-    const children = substages.filter(s=>s.major===major);
-    children.forEach((sub,index)=>{
-      html += '<tr>';
-      if(index === 0){
-        html += `<th class="stage-group" rowspan="${children.length}">${major}<br>(${formatNum(inputs.durations[major])}M)</th>`;
-      }
-      html += `<td class="substage-name">${sub.name}</td>`;
-      departments.forEach(dept=>{
-        const max = Number(inputs.headcounts[dept]) || 0;
-        let val = Number(peopleDemand[dept][sub.key]) || 0;
-        if(val > max) val = max;
-        peopleDemand[dept][sub.key] = val;
-        html += `
-          <td>
-            <input class="people-input" data-dept="${dept}" data-substage="${sub.key}" type="number" min="0" max="${max}" step="0.1" value="${formatNum(val)}">
-          </td>
-        `;
       });
-      html += '</tr>';
     });
   });
 
-  html += '</tbody></table>';
-  $("#peopleTableWrap").html(html);
+  return smoothed;
 }
 
-function syncLabels(){
-  $("#projectCountVal").text($("#projectCount").val());
-  $("#monthsVal").text($("#simulationMonths").val());
-  $("#hoursVal").text($("#hoursPerPerson").val());
-  $("#proposalDurationVal").text($("#proposalDuration").val());
-  $("#prepDurationVal").text($("#prepDuration").val());
-  $("#executionDurationVal").text($("#executionDuration").val());
-  $("#operationDurationVal").text($("#operationDuration").val());
-  $("#closingDurationVal").text($("#closingDuration").val());
-}
-
-function refresh(options={}){
-  syncLabels();
-  if(options.rebuildPeopleTable) renderPeopleTable();
-  const result = simulate();
-  renderSummary(result);
-  renderChart(result);
-  renderTimeline(result);
-  renderHeatmap(result);
-}
-
-
-function exportModelData(){
-  const inputs = getInputs();
-  const data = {
-    app: "Lifecycle Workforce Simulator",
-    version: "2.1",
-    exportedAt: new Date().toISOString(),
-    settings: {
-      projectCount: inputs.projectCount,
-      intervals: inputs.intervals,
-      simulationMonths: inputs.simulationMonths,
-      hoursPerPerson: inputs.hoursPerPerson,
-      durations: inputs.durations,
-      headcounts: inputs.headcounts
-    },
-    peopleDemand: peopleDemand
-  };
-
-  const json = JSON.stringify(data, null, 2);
-  const blob = new Blob([json], {type: "application/json;charset=utf-8"});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  const ts = new Date().toISOString().slice(0,19).replace(/[:T]/g, "-");
-  a.href = url;
-  a.download = `workforce-simulator-data-${ts}.json`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
-
-function importModelData(file){
-  if(!file) return;
-
-  const reader = new FileReader();
-  reader.onload = function(event){
-    try{
-      const data = JSON.parse(event.target.result);
-
-      if(!data.settings || !data.peopleDemand){
-        alert("匯入失敗：檔案格式不符合本模擬器資料格式。");
-        return;
-      }
-
-      const s = data.settings;
-
-      $("#projectCount").val(clampNumber(s.projectCount, 1, 5, 2));
-      intervalValues = Array.isArray(s.intervals) ? s.intervals.slice(0,4) : [6,6,6,6];
-      renderIntervalInputs();
-
-      $("#simulationMonths").val(clampNumber(s.simulationMonths, 6, 60, 20));
-      $("#hoursPerPerson").val(clampNumber(s.hoursPerPerson, 80, 180, 140));
-
-      if(s.durations){
-        $("#proposalDuration").val(clampNumber(s.durations["提案期"], 0.5, 8, 2));
-        $("#prepDuration").val(clampNumber(s.durations["籌備期"], 0.5, 8, 1.5));
-        $("#executionDuration").val(clampNumber(s.durations["執行期"], 0.5, 12, 2));
-        $("#operationDuration").val(clampNumber(s.durations["營運期"], 0.5, 12, 2));
-        $("#closingDuration").val(clampNumber(s.durations["結案期"], 0.5, 6, 0.5));
-      }
-
-      if(s.headcounts){
-        departments.forEach(dept=>{
-          const val = Number(s.headcounts[dept]);
-          if(!Number.isNaN(val)){
-            $(`.headcount[data-dept='${dept}']`).val(Math.max(0, val));
-          }
-        });
-      }
-
-      departments.forEach(dept=>{
-        if(!peopleDemand[dept]) peopleDemand[dept] = {};
-        substages.forEach(sub=>{
-          const importedVal = data.peopleDemand?.[dept]?.[sub.key];
-          if(importedVal !== undefined){
-            peopleDemand[dept][sub.key] = Math.max(0, Number(importedVal) || 0);
-          }
-        });
-      });
-
-      renderPeopleTable();
-      refresh();
-      alert("匯入完成。");
-    }catch(err){
-      alert("匯入失敗：JSON 檔案無法讀取或格式錯誤。");
-      console.error(err);
-    }finally{
-      $("#importFileInput").val("");
-    }
-  };
-  reader.readAsText(file, "utf-8");
-}
-
-function clampNumber(value, min, max, fallback){
-  const n = Number(value);
-  if(Number.isNaN(n)) return fallback;
-  return Math.max(min, Math.min(max, n));
-}
-
-
-function bindEvents(){
-  $(document).on("input change","#simulationMonths,#hoursPerPerson,#proposalDuration,#prepDuration,#executionDuration,#operationDuration,#closingDuration",function(){
-    refresh({rebuildPeopleTable:true});
-  });
-
-  $(document).on("input change",".headcount",function(){
-    renderPeopleTable();
-    refresh();
-  });
-
-  $(document).on("input change",".interval-input",function(){
-    refresh();
-  });
-
-  $("#projectCount").on("input change",function(){
-    renderIntervalInputs();
-    refresh();
-  });
-
-  $(document).on("input change",".people-input",function(){
-    const dept = $(this).data("dept");
-    const substage = $(this).data("substage");
-    const max = Number($(this).attr("max")) || 0;
-    let val = Number($(this).val());
-    if(Number.isNaN(val)) val = 0;
-    val = Math.max(0, Math.min(max, val));
-    peopleDemand[dept][substage] = val;
-    $(this).val(formatNum(val));
-    refresh();
-  });
-
-  $("#resetBtn").on("click",function(){
-    $("#projectCount").val(2);
-    intervalValues = [6,6,6,6];
-    renderIntervalInputs();
-    $("#simulationMonths").val(20);
-    $("#hoursPerPerson").val(140);
-    $("#proposalDuration").val(2);
-    $("#prepDuration").val(1.5);
-    $("#executionDuration").val(2);
-    $("#operationDuration").val(2);
-    $("#closingDuration").val(0.5);
-    $(".headcount[data-dept='活動部門']").val(2);
-    $(".headcount[data-dept='商品與營運部門']").val(3);
-    $(".headcount[data-dept='行銷部門']").val(2);
-    $(".headcount[data-dept='設計部門']").val(2);
-    $(".headcount[data-dept='管理部門']").val(4);
-    peopleDemand = JSON.parse(JSON.stringify(defaultPeople));
-    renderPeopleTable();
-    refresh();
-  });
-
-  $("#scenarioBtn").on("click",function(){
-    $("#projectCount").val(4);
-    intervalValues = [2,2.5,3,6];
-    renderIntervalInputs();
-    $("#simulationMonths").val(24);
-    $("#proposalDuration").val(3);
-    $("#prepDuration").val(2);
-    $("#executionDuration").val(4);
-    $("#operationDuration").val(3);
-    $("#closingDuration").val(1);
-    renderPeopleTable();
-    refresh();
-  });
-
-  $("#exportDataBtn").on("click",function(){
-    exportModelData();
-  });
-
-  $("#importDataBtn").on("click",function(){
-    $("#importFileInput").click();
-  });
-
-  $("#importFileInput").on("change",function(){
-    importModelData(this.files[0]);
-  });
-}
-
-$(function(){
-  renderIntervalInputs();
-  renderPeopleTable();
-  bindEvents();
-  refresh();
-});
+function simulate(){const inputs=getInputs(),months=Array.from({length:inputs.simulationMonths},(_,i)=>`M${i+1}`),totalSteps=inputs.simulationMonths*2,built=buildSchedule(inputs.durations),smoothedHours=getSmoothedSubstageHours(inputs);const starts=[0];for(let i=1;i<inputs.projectCount;i++)starts.push(starts[i-1]+Math.round((inputs.intervals[i-1]||0)*2));const projects=starts.map((startStep,i)=>({id:`案件${i+1}`,startStep,startMonthLabel:`M${Math.floor(startStep/2)+1}`,schedule:built.schedule}));const stepHours={},monthlyHours={},monthlyLoad={};departments.forEach(d=>{stepHours[d]=Array(totalSteps).fill(0);monthlyHours[d]=[];monthlyLoad[d]=[]});projects.forEach(p=>p.schedule.forEach((sub,local)=>{const step=p.startStep+local;if(step<totalSteps)departments.forEach(d=>{stepHours[d][step]+=(smoothedHours[d][sub.key]||0)/Math.max(1,built.counts[sub.key]||1)})}));departments.forEach(d=>{for(let m=0;m<inputs.simulationMonths;m++){const h=(stepHours[d][m*2]||0)+(stepHours[d][m*2+1]||0),cap=(inputs.headcounts[d]||0)*(inputs.hoursPerPerson||0);monthlyHours[d].push(h);monthlyLoad[d].push(cap>0?h/cap:0)}});const projectMonthlyStages=projects.map(p=>{const row=[];for(let m=0;m<inputs.simulationMonths;m++){const a=p.schedule[m*2-p.startStep],b=p.schedule[m*2+1-p.startStep],la=a?`${a.major}-${a.name}`:"",lb=b?`${b.major}-${b.name}`:"";row.push(la&&lb&&la===lb?la:(la&&lb?`${la}/${lb}`:(la||lb||"")))}return{id:p.id,startMonthLabel:p.startMonthLabel,row}});return{months,projects,monthlyHours,monthlyLoad,projectMonthlyStages,inputs}}
+function avg(arr){return arr.length?arr.reduce((a,b)=>a+b,0)/arr.length:0}function fmt(n){const x=Number(n);return Number.isInteger(x)?String(x):x.toFixed(1)}function metric(t,v,n){return`<div class="metric"><h3>${t}</h3><div class="value">${v}</div><div class="note">${n}</div></div>`}
+function renderSummary(r){const all=departments.flatMap(d=>r.monthlyLoad[d]);let peak={dept:"-",month:"-",rate:-1,h:0,cap:0},over=0,idle=0;departments.forEach(d=>r.monthlyLoad[d].forEach((rate,i)=>{if(rate>1)over++;if(rate<.6)idle++;if(rate>peak.rate){peak={dept:d,month:`M${i+1}`,rate,h:r.monthlyHours[d][i],cap:(r.inputs.headcounts[d]||0)*(r.inputs.hoursPerPerson||0)}}}));const total=Object.values(r.inputs.headcounts).reduce((a,b)=>a+b,0);$("#summaryCards").html([metric("總人數",`${fmt(total)} 人`,"目前部門配置總和"),metric("模擬案件數",`${r.inputs.projectCount} 案`,"使用者設定的案件總量"),metric("平均負載率",`${(avg(all)*100).toFixed(0)}%`,"所有部門 × 所有月份的平均"),metric("最高峰",peak.dept,`${peak.month}：${fmt(peak.h)}h / ${fmt(peak.cap)}h，${(peak.rate*100).toFixed(0)}%`),metric("超載區間",`${over}`,"負載 > 100% 的部門月份格數")].join(""));const labels=r.projects.map(p=>`${p.id}: ${p.startMonthLabel}`).join(" / ");$("#insights").html(`<p><strong>案件啟動：</strong>${labels}</p><p><strong>最大瓶頸：</strong>${peak.dept} 在 ${peak.month} 需要約 ${fmt(peak.h)} 小時，負載 ${(peak.rate*100).toFixed(0)}%。</p><p><strong>低負載區間：</strong>${idle} 格。</p>`)}
+function renderChart(r){const ctx=document.getElementById("loadChart");if(chart)chart.destroy();chart=new Chart(ctx,{type:"line",data:{labels:r.months,datasets:departments.map(d=>({label:d,data:r.monthlyLoad[d].map(v=>Number((v*100).toFixed(1))),tension:.25,borderWidth:2,fill:false}))},options:{responsive:true,maintainAspectRatio:true,scales:{y:{beginAtZero:true,ticks:{callback:v=>v+"%"}}}}})}
+function renderTimeline(r){let html='<table class="timeline-table"><tr><th>案件 / 月份</th><th>啟動</th>';r.months.forEach(m=>html+=`<th>${m}</th>`);html+='</tr>';r.projectMonthlyStages.forEach(p=>{html+=`<tr><th>${p.id}</th><td><span class="pill">${p.startMonthLabel}</span></td>`;p.row.forEach(s=>html+=s?`<td class="active">${s}</td>`:`<td class="empty">-</td>`);html+='</tr>'});html+='</table>';$("#timelineWrap").html(html)}
+function renderHeatmap(r){let html='<table class="heatmap"><tr><th>部門 / 月份</th>';r.months.forEach(m=>html+=`<th>${m}</th>`);html+='</tr>';departments.forEach(d=>{html+=`<tr><th>${d}</th>`;r.monthlyLoad[d].forEach((rate,i)=>{let level="low";if(rate>1)level="over";else if(rate>=.85)level="high";else if(rate>=.6)level="mid";html+=`<td data-level="${level}">${(rate*100).toFixed(0)}%<br><span class="muted">${fmt(r.monthlyHours[d][i])}h</span></td>`});html+='</tr>'});html+='</table>';$("#heatmapWrap").html(html)}
+function renderHoursTable(){const inputs=getInputs();let html='<table><tr><th>主階段</th><th>子階段</th>';departments.forEach(d=>html+=`<th>${d}<br><span class="muted">${fmt((inputs.headcounts[d]||0)*(inputs.hoursPerPerson||0))}h/月</span></th>`);html+='</tr>';majorStages.forEach(major=>{const children=substages.filter(s=>s.major===major);children.forEach((sub,idx)=>{html+='<tr>';if(idx===0)html+=`<th class="stage-group" rowspan="${children.length}">${major}<br>(${fmt(inputs.durations[major])}M)</th>`;html+=`<td class="substage-name">${sub.name}</td>`;departments.forEach(d=>{html+=`<td><div class="hours-cell"><input class="hours-total" value="${fmt(sumTasks(d,sub.key))}" readonly><button type="button" class="small detail-btn" data-dept="${d}" data-substage="${sub.key}">明細</button></div></td>`});html+='</tr>'})});html+='</table>';$("#hoursTableWrap").html(html)}
+function syncLabels(){$("#projectCountVal").text($("#projectCount").val());$("#monthsVal").text($("#simulationMonths").val());$("#hoursVal").text($("#hoursPerPerson").val());$("#proposalDurationVal").text($("#proposalDuration").val());$("#prepDurationVal").text($("#prepDuration").val());$("#executionDurationVal").text($("#executionDuration").val());$("#operationDurationVal").text($("#operationDuration").val());$("#closingDurationVal").text($("#closingDuration").val())}
+function refresh(){syncLabels();const r=simulate();renderSummary(r);renderChart(r);renderTimeline(r);renderHeatmap(r)}
+function refreshAll(){renderHoursTable();refresh()}
+function openTaskModal(d,s){currentModal={dept:d,substage:s};ensureTaskPath(d,s);const sub=substages.find(x=>x.key===s);$("#modalTitle").text(`${d}｜${sub.major}-${sub.name}`);$("#modalSub").text("新增或刪除工作項目，並填入每個項目的需求工時。");renderTaskRows();$("#taskModalBackdrop").css("display","flex")}
+function closeTaskModal(){currentModal={dept:null,substage:null};$("#taskModalBackdrop").hide();refreshAll()}
+function renderTaskRows(){const d=currentModal.dept,s=currentModal.substage;if(!d||!s)return;let html="";taskDetails[d][s].forEach((t,i)=>{html+=`<div class="task-row"><input class="task-name" data-index="${i}" placeholder="工作項目名稱" value="${escapeHtml(t.name||"")}"><input class="task-hours" data-index="${i}" type="number" min="0" step="0.5" value="${fmt(t.hours||0)}"><button class="small danger delete-task" data-index="${i}">刪除</button></div>`});if(!html)html='<div class="tips">目前沒有工作項目。按「新增工作項目」開始建立明細。</div>';$("#taskRows").html(html);$("#modalTotalHours").text(fmt(sumTasks(d,s)));refreshAll()}
+function exportData(){const inputs=getInputs();const data={app:"Lifecycle Workforce Simulator",version:"4.0-task-details",exportedAt:new Date().toISOString(),settings:{projectCount:inputs.projectCount,intervals:inputs.intervals,simulationMonths:inputs.simulationMonths,hoursPerPerson:inputs.hoursPerPerson,durations:inputs.durations,headcounts:inputs.headcounts,smoothWithinMajorStage:$("#smoothWithinMajorStage").is(":checked")},taskDetails};const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json;charset=utf-8"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=`workforce-simulator-task-details-${new Date().toISOString().slice(0,19).replace(/[:T]/g,"-")}.json`;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url)}
+function normalizeTasks(imported){const out=JSON.parse(JSON.stringify(defaultTaskDetails));departments.forEach(d=>substages.forEach(s=>{const arr=imported?.[d]?.[s.key];if(Array.isArray(arr))out[d][s.key]=arr.map(x=>({name:String(x.name||""),hours:Math.max(0,Number(x.hours)||0)}))}));return out}
+function importData(file){if(!file)return;const reader=new FileReader();reader.onload=e=>{try{const data=JSON.parse(e.target.result),s=data.settings||{};$("#projectCount").val(Math.max(1,Math.min(5,Number(s.projectCount)||2)));intervalValues=Array.isArray(s.intervals)?s.intervals.slice(0,4):[6,6,6,6];renderIntervalInputs();$("#simulationMonths").val(Math.max(6,Math.min(60,Number(s.simulationMonths)||20)));$("#hoursPerPerson").val(Math.max(80,Math.min(180,Number(s.hoursPerPerson)||140)));if(s.durations){$("#proposalDuration").val(s.durations["提案期"]||2);$("#prepDuration").val(s.durations["籌備期"]||1.5);$("#executionDuration").val(s.durations["執行期"]||2);$("#operationDuration").val(s.durations["營運期"]||2);$("#closingDuration").val(s.durations["結案期"]||.5)}if(s.headcounts)departments.forEach(d=>{$(`.headcount[data-dept='${d}']`).val(Math.max(0,Number(s.headcounts[d])||0))});if(data.taskDetails)taskDetails=normalizeTasks(data.taskDetails);alert("匯入完成");refreshAll()}catch(err){alert("匯入失敗：JSON格式錯誤");console.error(err)}finally{$("#importFileInput").val("")}};reader.readAsText(file,"utf-8")}
+function bind(){document.addEventListener("input",e=>{if(e.target.matches("#projectCount")){renderIntervalInputs();refreshAll()}else if(e.target.matches("input[type=range],.headcount,.interval-input,#smoothWithinMajorStage"))refreshAll()});$(document).on("click",".detail-btn",function(){openTaskModal($(this).data("dept"),$(this).data("substage"))});$("#closeTaskModal").on("click",closeTaskModal);$("#taskModalBackdrop").on("click",function(e){if(e.target===this)closeTaskModal()});$("#addTaskBtn").on("click",()=>{const d=currentModal.dept,s=currentModal.substage;ensureTaskPath(d,s);taskDetails[d][s].push({name:"",hours:0});renderTaskRows()});$(document).on("input",".task-name",function(){const d=currentModal.dept,s=currentModal.substage;taskDetails[d][s][Number($(this).data("index"))].name=$(this).val()});$(document).on("input",".task-hours",function(){const d=currentModal.dept,s=currentModal.substage;taskDetails[d][s][Number($(this).data("index"))].hours=Math.max(0,Number($(this).val())||0);$("#modalTotalHours").text(fmt(sumTasks(d,s)));refreshAll()});$(document).on("click",".delete-task",function(){const d=currentModal.dept,s=currentModal.substage;taskDetails[d][s].splice(Number($(this).data("index")),1);renderTaskRows()});$("#clearHoursBtn").on("click",()=>{departments.forEach(d=>substages.forEach(s=>taskDetails[d][s.key]=[]));refreshAll()});$("#resetBtn").on("click",()=>{taskDetails=JSON.parse(JSON.stringify(defaultTaskDetails));$("#projectCount").val(2);intervalValues=[6,6,6,6];renderIntervalInputs();$("#simulationMonths").val(20);$("#hoursPerPerson").val(140);$("#proposalDuration").val(2);$("#prepDuration").val(1.5);$("#executionDuration").val(2);$("#operationDuration").val(2);$("#closingDuration").val(.5);$("#smoothWithinMajorStage").prop("checked",false);$(".headcount[data-dept='活動部門']").val(2);$(".headcount[data-dept='商品與營運部門']").val(3);$(".headcount[data-dept='行銷部門']").val(2);$(".headcount[data-dept='設計部門']").val(2);$(".headcount[data-dept='管理部門']").val(4);refreshAll()});$("#scenarioBtn").on("click",()=>{$("#projectCount").val(4);intervalValues=[2,2.5,3,6];renderIntervalInputs();$("#simulationMonths").val(24);$("#proposalDuration").val(3);$("#prepDuration").val(2);$("#executionDuration").val(4);$("#operationDuration").val(3);$("#closingDuration").val(1);refreshAll()});$("#exportDataBtn").on("click",exportData);$("#importDataBtn").on("click",()=>$("#importFileInput").click());$("#importFileInput").on("change",function(){importData(this.files[0])})}
+$(function(){renderIntervalInputs();bind();refreshAll()});
 </script>
-</body>
-</html>
+</body></html>
